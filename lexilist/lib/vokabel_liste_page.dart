@@ -7,7 +7,7 @@ import 'package:LexiList/vokabel_tile_example.dart';
 
 class VokabelListePage extends StatefulWidget {
   final String einkaufslisteName;
-  final List<VokabelTileExample> listTiles;
+ List<VokabelTileExample> listTiles;
   final int index;
 
   final Function saveCallback;
@@ -31,6 +31,35 @@ class VokabelListePage extends StatefulWidget {
 }
 
 class VokabelListePageState extends State<VokabelListePage> {
+  bool isDeleteMode = false;
+  bool isDeleteClickedOnce = false;
+  
+
+   Future<void> _loadListTiles() async {
+    final prefs = await SharedPreferences.getInstance();
+    int i = widget.index;
+    List<String>? savedListTiles =
+        prefs.getStringList('V$i');
+    
+    if (savedListTiles != null) {
+      savedListTiles.removeAt(0);
+      setState(() {
+        widget.listTiles = savedListTiles.map((tileData) {
+          List<String> parts = tileData.split('*');
+          return VokabelTileExample(
+            // Always start as unselected
+            Iteminformationen: tileData ,
+            saveCallback: widget.saveCallback,
+            
+            isDeleteMode: isDeleteMode,
+            
+          );
+        }).toList();
+      });
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,39 +72,19 @@ class VokabelListePageState extends State<VokabelListePage> {
         centerTitle: true,
         leading: BackButton(
           //icon: Icon(Icons.home),
-          onPressed: () async {
-            Navigator.pop(context);
-            late SharedPreferences _prefs;
-            _prefs = await SharedPreferences.getInstance();
-            bool? zweimal = _prefs.getBool('zweimal');
-            if (zweimal != null && zweimal == true) {
-              Navigator.pop(context);
-              _prefs.setBool('zweimal', false);
-            }
-
-            //an Chatgpt hier möchte ich immer zu Vokabel zurückkehren
-          },
+          onPressed: () {
+              if (isDeleteMode) {
+                _DeleteModeOff();
+              } else {
+                Navigator.pop(context);
+              }
+            },
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.delete),
-            onPressed: () {
-              List<VokabelTileDeleteExample> volleliste = dListeErstellen();
-
-              deletePage loeschListe = deletePage(
-                jeneListe: widget,
-                jeneListeState: this,
-                dListTiles: volleliste,
-              );
-              //loeschListe.listeFuellen();
-              
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => loeschListe),
-              );
-            },
-            color: Colors.red,
-          ),
+          isDeleteMode?Center(child:Text('Löschauswahl aktiv  ',style: TextStyle(fontSize: 20,color: Colors.red,fontWeight: FontWeight.bold))):IconButton(
+              icon: Icon(Icons.delete, color: Colors.red),
+              onPressed: _toggleDeleteMode,
+            )
         ],
       ),
 
@@ -120,6 +129,16 @@ class VokabelListePageState extends State<VokabelListePage> {
           //  backgroundColor: Colors.blueGrey,
           //),
           SizedBox(height: 16),
+          isDeleteMode?FloatingActionButton(
+            backgroundColor: Color.fromARGB(255, 10, 250, 238),
+            tooltip: 'Löschen',
+            onPressed: _toggleDeleteMode,
+            child: Icon(
+              Icons.delete,
+              color: Colors.black,
+            ),
+          )
+          :
           FloatingActionButton(
             backgroundColor: Color.fromARGB(255, 10, 250, 238),
             tooltip: 'Vokabel hinzufügen',
@@ -130,11 +149,85 @@ class VokabelListePageState extends State<VokabelListePage> {
               Icons.add,
               color: Colors.black,
             ),
-          ),
+          )
         ],
       ),
     );
   }
+void _toggleDeleteMode() {
+    if (isDeleteMode && isDeleteClickedOnce) {
+      _showDeleteConfirmationDialog();
+      setState(() {
+        isDeleteClickedOnce = false; // Reset after showing dialog
+      });
+    } else {
+      if(widget.listTiles.isNotEmpty){
+      setState(() {
+        isDeleteMode = !isDeleteMode;
+        isDeleteClickedOnce = isDeleteMode; 
+        _loadListTiles();// Set true if entering delete mode
+        if (isDeleteMode) {
+          for (var tile in widget.listTiles) {
+            setState(() {
+            
+            tile.isSelectedForDeletion = false;
+            });
+            setState(() {
+              
+            });
+            
+          }
+        }
+      });
+    }
+  }}
+  void _DeleteModeOff() {
+    if (isDeleteMode) {
+      setState(() {
+        isDeleteMode = false;
+        _loadListTiles();
+      });
+    }
+  }
+  void _showDeleteConfirmationDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Willst du dies wirklich löschen?'),
+          actions: <Widget>[
+            MaterialButton(
+              elevation: 5.0,
+              child: Text('Abbrechen'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            MaterialButton(
+              elevation: 5.0,
+              child: Text('Ja'),
+              onPressed: () {
+                _deleteSelectedItems();
+                Navigator.of(context).pop();
+              },
+            )
+          ],
+        );
+      },
+    );
+  }
+    void _deleteSelectedItems() {
+    setState(() {
+      widget.listTiles.removeWhere((tile) => tile.isSelectedForDeletion);
+      isDeleteMode = false;
+      
+    });
+    widget.saveCallback();
+    setState(() {
+        _loadListTiles();
+      });
+  }
+
 
   String NameGeben() {
     return widget.einkaufslisteName;
@@ -177,7 +270,7 @@ class VokabelListePageState extends State<VokabelListePage> {
               ),
               TextField(
                 controller: customController2,
-                decoration: InputDecoration(hintText: 'Übersetzung'),
+                decoration: InputDecoration(hintText: 'Übersetzung:'),
               ),
             ],
           ),
@@ -209,6 +302,7 @@ class VokabelListePageState extends State<VokabelListePage> {
     widget.listTiles.add(VokabelTileExample(
       Iteminformationen: '$Uebersetzung*true*$Fremdsprache',
       saveCallback: widget.saveCallback,
+      isDeleteMode: isDeleteMode,
     ));
     setState(() {});
 

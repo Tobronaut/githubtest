@@ -321,6 +321,7 @@ class _EinkaufsListePage extends State<EinkaufsListePage> {
     );
   }
 
+
   void _deleteSelectedItems() {
     setState(() {
       widget.listTiles.removeWhere((tile) => tile.isSelectedForDeletion);

@@ -5,9 +5,11 @@ import 'package:flutter/material.dart';
 class VokabelTileExample extends StatefulWidget {
   final String Iteminformationen;
   final Function saveCallback;
+  bool isDeleteMode;
+  bool isSelectedForDeletion = false;
 
-  const VokabelTileExample(
-      {Key? key, required this.Iteminformationen, required this.saveCallback})
+  VokabelTileExample(
+      {Key? key, required this.Iteminformationen, required this.saveCallback,required this.isDeleteMode})
       : super(key: key);
 
   @override
@@ -31,6 +33,11 @@ class VokabelTileExample extends StatefulWidget {
   set aktuelleInfos(String Infos) {
     aktuelleInfos = Infos;
   }
+    void changemode(bool isDeleteMode) {
+    this.isDeleteMode = isDeleteMode;
+    
+  }
+
 }
 
 class _VokabelTileExampleState extends State<VokabelTileExample> {
@@ -56,17 +63,7 @@ class _VokabelTileExampleState extends State<VokabelTileExample> {
   bool isEnabled() {
     String enabledString = Informationsverwaltung(1);
     return enabledString != 'false';
-  }
-
-  void EnabledAendern(bool wert) {
-    print('Iteminformationenübergeben');
-    String Senabled = 'true';
-    if (wert == false) {
-      Senabled = 'false';
-    }
-    Informationsaenderung(1, Senabled);
-    setState(() {});
-  }
+  } 
 
   String aktuelleInfos() {
     return '$neuItemname*$_enabled*$Uebersetzung';
@@ -76,6 +73,22 @@ class _VokabelTileExampleState extends State<VokabelTileExample> {
   Widget build(BuildContext context) {
     return Card(
       child: ListTile(
+        onTap: () {
+        setState(() {
+          if (widget.isDeleteMode) {
+            widget.isSelectedForDeletion = !widget.isSelectedForDeletion;}
+            });
+            },
+        leading: widget.isDeleteMode?Checkbox(
+              value: widget.isSelectedForDeletion,
+              onChanged: (value) {
+                setState(() {
+                  widget.isSelectedForDeletion = value!;
+                  
+                });
+              },
+            ):null,
+
         title: Text(neuItemname),
         subtitle: Text('Übersetzung: $Uebersetzung'),
         //subtitle: Text('Enabled: $_enabled, Selected: $_selected,'),

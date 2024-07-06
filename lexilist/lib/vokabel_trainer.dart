@@ -33,7 +33,8 @@ class _VokabelTrainerState extends State<VokabelTrainer> {
         _currentTile = new VokabelTileExample(
             Iteminformationen:
                 '    Alle Vokabeln abgefragt     *true*    Alle Vokabeln abgefragt     ',
-            saveCallback: leereDummimethode);
+            saveCallback: leereDummimethode,isDeleteMode: false,);
+            
       }
     });
   }

@@ -46,6 +46,7 @@ class VokabelnState extends State<Vokabeln> {
             teile.add(VokabelTileExample(
               Iteminformationen: alles[j],
               saveCallback: speichern,
+              isDeleteMode: false,
             ));
           }
         }
