@@ -105,6 +105,7 @@ class VokabelnState extends State<Vokabeln> {
         ],
       ),
       body: ReorderableListView(
+        buildDefaultDragHandles: true,
         // Verringerter Abstand zu den Seiten
         children: [
           for (int index = 0; index < anzeigen.length; index++)
@@ -130,17 +131,52 @@ class VokabelnState extends State<Vokabeln> {
           _loadEverything();
         },
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: Column( 
+        mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        //  floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+        children:[
+          FloatingActionButton(
+            backgroundColor: Color.fromARGB(255, 10, 250, 238),
+            tooltip: 'Vokabeltrainer',
+            child: Icon(
+          Icons.school,
+          color: Colors.black,),
+        
+
+              onPressed: () {
+              List<VokabelTileExample> Abzufragen = lists
+                  .expand(
+                      (list) => list.listTiles.where((tile) => tile.enabled))
+                  .toList();
+              if (Abzufragen.isNotEmpty) {
+                Auswahl auswahl = Auswahl(alleListen: lists);
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => auswahl),
+                );
+              }
+            
+            }
+          ),
+          SizedBox(height: 16),
+
+
+          FloatingActionButton(
         tooltip: 'Vokabel hinzufügen',
         onPressed: _createNewList,
         child: Icon(
           Icons.add,
           color: Colors.black,
         ),
-        backgroundColor: Color.fromARGB(255, 10, 250, 238),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-    );
+        backgroundColor: Color.fromARGB(255, 10, 250, 238),)
+        
+      
+      ]
+        
+     
+    ));
   }
 
   Future<void> addListTile(String name, List<VokabelTileExample> liste) async {

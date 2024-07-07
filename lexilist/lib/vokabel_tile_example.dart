@@ -72,6 +72,9 @@ class _VokabelTileExampleState extends State<VokabelTileExample> {
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: widget.isSelectedForDeletion
+                ? Color.fromARGB(96, 10, 250, 238) // Blaugrau
+                : null, 
       child: ListTile(
         onTap: () {
         setState(() {
@@ -80,6 +83,7 @@ class _VokabelTileExampleState extends State<VokabelTileExample> {
             });
             },
         leading: widget.isDeleteMode?Checkbox(
+          activeColor:Color.fromARGB(255, 0, 255, 242) ,
               value: widget.isSelectedForDeletion,
               onChanged: (value) {
                 setState(() {

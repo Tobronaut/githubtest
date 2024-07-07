@@ -4,6 +4,7 @@ import 'package:LexiList/vokabel_tile_example.dart';
 class VokabelTrainer extends StatefulWidget {
   final List<VokabelTileExample> listTiles;
   final bool umgekert;
+  
 
   VokabelTrainer({Key? key, required this.listTiles, required this.umgekert})
       : super(key: key);
@@ -15,6 +16,7 @@ class VokabelTrainer extends StatefulWidget {
 class _VokabelTrainerState extends State<VokabelTrainer> {
   late List<VokabelTileExample> _toCheck;
   late VokabelTileExample _currentTile;
+  late VokabelTileExample _lastTile;
   bool umgekert = false;
 
   @override
@@ -27,6 +29,8 @@ class _VokabelTrainerState extends State<VokabelTrainer> {
   void _nextTile() async {
     setState(() {
       if (_toCheck.isNotEmpty) {
+        _lastTile = _currentTile;
+
         _currentTile = _toCheck.removeAt(0);
       } else {
         // Handle the end of the list, e.g., show a message
@@ -53,12 +57,13 @@ class _VokabelTrainerState extends State<VokabelTrainer> {
     if (isCorrect) {
       _nextTile();
     } else {
+
       setState(() {
         _toCheck.add(_currentTile);
         _nextTile();
       });
     }
-    _showFeedbackDialog(isCorrect);
+    _showFeedbackDialog(isCorrect,true);
   }
 
   @override
@@ -97,12 +102,23 @@ class _VokabelTrainerState extends State<VokabelTrainer> {
         children: [
           Expanded(
             child: Center(
-              child: Text(
+              child: 
+              Row(
+                
+                children: [
+                SizedBox(width: 50,),
+                Expanded(child:Center(child:Text(
                 widget.umgekert
                     ? _currentTile.neuItemname
                     : _currentTile.Uebersetzung,
                 style: TextStyle(fontSize: 30),
+              ),)
+                
               ),
+              SizedBox(width: 50,),
+
+              ],)
+              
             ),
           ),
           Row(
@@ -129,6 +145,7 @@ class _VokabelTrainerState extends State<VokabelTrainer> {
                   child: TextButton(
                     onPressed: () {
                       _dontKnow();
+                      _showFeedbackDialog(false,false);
                     },
                     child: Text(
                       'Weiß ich nicht',
@@ -169,12 +186,20 @@ class _VokabelTrainerState extends State<VokabelTrainer> {
     );
   }
 
-  void _showFeedbackDialog(bool isCorrect) {
+  void _showFeedbackDialog(bool isCorrect,bool mode) {
+    String Loesung = widget.umgekert
+                    ? _lastTile.Uebersetzung
+                    : _lastTile.neuItemname;
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          content: Row(
+          
+          content:Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+
+             mode? Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
@@ -187,13 +212,19 @@ class _VokabelTrainerState extends State<VokabelTrainer> {
                 isCorrect ? 'Richtig!' : 'Falsch!',
                 style: TextStyle(fontSize: 24),
               ),
+              
+              
             ],
-          ),
+          ): Text('skill issue'),
+          Text(isCorrect ? '': 'Lösung: $Loesung',style: TextStyle(fontSize: 24),)
+
+          ],)
+          
         );
       },
     );
 
-    Future.delayed(Duration(milliseconds: 325), () {
+    Future.delayed(Duration(milliseconds: 1500), () {
       Navigator.of(context).pop();
       if (_currentTile.Uebersetzung == '    Alle Vokabeln abgefragt     ') {
         Navigator.pop(context);
