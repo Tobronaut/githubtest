@@ -156,10 +156,11 @@ class VokabelListePageState extends State<VokabelListePage> {
   }
 void _toggleDeleteMode() {
     if (isDeleteMode && isDeleteClickedOnce) {
-      _showDeleteConfirmationDialog();
       setState(() {
         isDeleteClickedOnce = false; // Reset after showing dialog
       });
+      _showDeleteConfirmationDialog();
+      
     } else {
       if(widget.listTiles.isNotEmpty){
       setState(() {
@@ -200,6 +201,9 @@ void _toggleDeleteMode() {
               elevation: 5.0,
               child: Text('Abbrechen'),
               onPressed: () {
+                setState(() {
+                  isDeleteClickedOnce = true;
+                });
                 Navigator.of(context).pop();
               },
             ),

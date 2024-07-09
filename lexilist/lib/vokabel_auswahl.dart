@@ -19,6 +19,7 @@ class AuswahlpageState extends State<Auswahl> {
   List<bool> ausgewaehlt = [];
   bool umgekehrt = false;
   bool mixen = false;
+  bool alleauswaehlen = false;
 
   @override
   void initState() {
@@ -59,34 +60,53 @@ class AuswahlpageState extends State<Auswahl> {
         ],
         centerTitle: true,
       ),
-      body: ListView.builder(
+      body: Column(
+  mainAxisSize: MainAxisSize.min,
+  children: [
+    ListTile(
+      title: Text('alle auswählen'),
+      trailing: Switch(
+       value: alleauswaehlen,
+        onChanged: (bool value) {
+          setState(() {
+            for (int i = 0; i < ausgewaehlt.length; i++) {
+              ausgewaehlt[i] = value;
+              alleauswaehlen = value;
+            }
+          });
+        },
+      ),
+    ),
+    Expanded(
+      child: ListView.builder(
         itemCount: widget.alleListen.length,
         itemBuilder: (context, index) {
           return Card(
             color: ausgewaehlt[index]
                 ? Color.fromARGB(96, 10, 250, 238) // Blaugrau
                 : null, // Hellgrau,
-            child:ListTile(
-            title: Text(
-              widget.alleListen[index].einkaufslisteName,
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+            child: ListTile(
+              title: Text(
+                widget.alleListen[index].einkaufslisteName,
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+              ),
+              trailing: Checkbox(
+                activeColor: Color.fromARGB(255, 0, 255, 242),
+                value: ausgewaehlt[index],
+                onChanged: (value) {
+                  setState(() {
+                    ausgewaehlt[index] = value!;
+                  });
+                },
+              ),
             ),
-
-            trailing: Checkbox(
-              activeColor:Color.fromARGB(255, 0, 255, 242) ,
-              value: ausgewaehlt[index],
-              onChanged: (value) {
-                setState(() {
-                  ausgewaehlt[index] = value!;
-                });
-              },
-            ),
-            
-          ),
-          
           );
         },
       ),
+    ),
+  ],
+),
+
       floatingActionButton: FloatingActionButton(
         
         
@@ -122,7 +142,7 @@ class AuswahlpageState extends State<Auswahl> {
     int? counter = _prefs.getInt('Vcounter');
     if (counter != null) {
       setState(() {
-        ausgewaehlt = List.filled(counter, true);
+        ausgewaehlt = List.filled(counter, false);
       });
     }
   }

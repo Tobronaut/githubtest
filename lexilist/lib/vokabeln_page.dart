@@ -85,6 +85,12 @@ class VokabelnState extends State<Vokabeln> {
         centerTitle: true,
         actions: [
           IconButton(
+            icon: const Icon(Icons.question_mark),
+            onPressed:() => showQuestionDialog(),
+
+
+          ),
+          IconButton(
             icon: Icon(Icons.school),
             tooltip: 'Alle aktivierten Vokabeln abfragen',
             onPressed: () {
@@ -286,4 +292,34 @@ class VokabelnState extends State<Vokabeln> {
       },
     );
   }
+  Future<void> showQuestionDialog() {
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Tutorial'),
+          content: Column(mainAxisSize: MainAxisSize.min,children: [
+            Text('Tutorial-Text wird noch entworfen')
+          ],),
+          
+
+
+
+          actions: <Widget>[
+            MaterialButton(
+              elevation: 5.0,
+              child: Text('OK'),
+              onPressed: () {
+                
+                Navigator.of(context).pop();
+              },
+            )
+          ],
+        );
+      },
+    );
+  }
 }
+
+
+
