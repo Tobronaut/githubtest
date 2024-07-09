@@ -92,7 +92,7 @@ class VokabelnState extends State<Vokabeln> {
           ),
           IconButton(
             icon: Icon(Icons.school),
-            tooltip: 'Alle aktivierten Vokabeln abfragen',
+            tooltip: 'Vokabeltrainer',
             onPressed: () {
               List<VokabelTileExample> Abzufragen = lists
                   .expand(
