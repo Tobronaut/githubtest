@@ -81,7 +81,7 @@ class VokabelListePageState extends State<VokabelListePage> {
             },
         ),
         actions: [
-          isDeleteMode?Center(child:Text('Löschauswahl aktiv  ',style: TextStyle(fontSize: 20,color: Colors.red,fontWeight: FontWeight.bold))):IconButton(
+          isDeleteMode?Center(child:Text('Löschauswahl  ',style: TextStyle(fontSize: 20,color: Colors.red,fontWeight: FontWeight.bold))):IconButton(
               icon: Icon(Icons.delete, color: Colors.red),
               onPressed: _toggleDeleteMode,
             )
